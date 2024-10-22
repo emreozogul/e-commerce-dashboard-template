@@ -4,15 +4,15 @@ import { Header } from "@/components/containers/Header"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <AuthProvider >
-            <div className="flex min-h-screen w-full " >
+        <AuthProvider>
+            <div className="flex min-h-screen">
                 <Sidebar />
-                <div className="flex min-h-screen w-full flex-col " >
+                <div className="flex flex-col flex-1">
                     <Header />
-                    <div className="flex flex-col ">
+                    <main className="flex-1 overflow-y-auto">
                         {children}
-                    </div>
-                </div >
+                    </main>
+                </div>
             </div>
         </AuthProvider>
     )
