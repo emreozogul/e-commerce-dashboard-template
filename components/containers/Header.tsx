@@ -6,7 +6,7 @@ import { useSidebarStore } from "@/store/siderbarStore"
 export function Header() {
     const { setSidebarOpen } = useSidebarStore()
     return (
-        <header className="bg-white shadow">
+        <header className="bg-white shadow sticky top-0 z-10">
             <div className="flex items-center justify-between px-4 py-3">
                 <Button
                     variant="ghost"
