@@ -1,33 +1,30 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { Button, Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
-
-export const storeConfigSchema = z.object({
-    storeName: z.string().min(2, { message: 'Store name must be at least 2 characters.' }),
-    storeUrl: z.string().url({ message: 'Please enter a valid URL.' }),
-    supportEmail: z.string().email({ message: 'Please enter a valid email address.' }),
-    defaultCurrency: z.string().min(1, { message: 'Please select a default currency.' }),
-    orderPrefix: z.string().min(1, { message: 'Order prefix is required.' }),
-})
+import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
 
 type StoreConfigFormProps = {
-    onSubmit: (data: z.infer<typeof storeConfigSchema>) => void
+    onSubmit: (data: any) => void
     isSubmitting: boolean
 }
 
 export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps) => {
-    const form = useForm<z.infer<typeof storeConfigSchema>>({
-        resolver: zodResolver(storeConfigSchema),
-        defaultValues: {
-            storeName: '',
-            storeUrl: '',
-            supportEmail: '',
-            defaultCurrency: '',
-            orderPrefix: '',
-        },
+    const [formData, setFormData] = useState({
+        storeName: '',
+        storeUrl: '',
+        supportEmail: '',
+        defaultCurrency: '',
+        orderPrefix: '',
     })
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        onSubmit(formData)
+    }
 
     return (
         <Card>
@@ -36,29 +33,24 @@ export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps
                 <CardDescription>Manage your store&apos;s basic information and settings.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <FormField
-                            control={form.control}
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div>
+                        <label htmlFor="storeName">Store Name</label>
+                        <Input
+                            id="storeName"
                             name="storeName"
-                            render={({ field }: { field: any }) => (
-                                <FormItem>
-                                    <FormLabel>Store Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="My Awesome Store" {...field} />
-                                    </FormControl>
-                                    <FormDescription>This is the name that will be displayed to your customers.</FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                            value={formData.storeName}
+                            onChange={handleChange}
+                            placeholder="My Awesome Store"
                         />
-                        {/* Add other form fields here */}
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {isSubmitting ? 'Saving...' : 'Save Changes'}
-                        </Button>
-                    </form>
-                </Form>
+                        <p>This is the name that will be displayed to your customers.</p>
+                    </div>
+                    {/* Add other form fields here */}
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                </form>
             </CardContent>
         </Card>
     )
