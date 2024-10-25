@@ -36,7 +36,7 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
             <CardHeader>
                 <CardTitle>Payment Settings</CardTitle>
                 <CardDescription>
-                    Configure your store's payment gateways.
+                    Configure your store&apos;s payment gateways.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -146,6 +146,7 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
                                 />
                             </>
                         )}
+                        <FormDescription>Don&apos;t worry, your API keys are securely stored.</FormDescription>
                         <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {isSubmitting ? 'Saving...' : 'Save Payment Settings'}

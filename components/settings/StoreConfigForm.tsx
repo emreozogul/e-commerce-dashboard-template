@@ -33,7 +33,7 @@ export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps
         <Card>
             <CardHeader>
                 <CardTitle>Store Configuration</CardTitle>
-                <CardDescription>Manage your store's basic information and settings.</CardDescription>
+                <CardDescription>Manage your store&apos;s basic information and settings.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Form {...form}>

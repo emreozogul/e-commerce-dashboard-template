@@ -17,9 +17,6 @@ type SettingsFormValues =
 export default function AdminSettingsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-
-
-
     async function onSubmit(values: SettingsFormValues) {
         setIsSubmitting(true)
         try {
@@ -30,6 +27,7 @@ export default function AdminSettingsPage() {
                 description: 'Your changes have been saved.',
             })
         } catch (error) {
+            console.error('Error:', error) // Use the error variable
             toast({
                 title: 'Error',
                 description: 'There was a problem updating the settings. Please try again.',
