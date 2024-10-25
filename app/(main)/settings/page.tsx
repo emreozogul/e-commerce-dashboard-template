@@ -4,11 +4,23 @@ import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/hooks/use-toast'
 import { StoreConfigForm, PaymentSettingsForm, TaxSettingsForm } from '@/components/settings'
+import { z } from 'zod'
+import { storeConfigSchema } from '@/components/settings/StoreConfigForm'
+import { paymentSettingsSchema } from '@/components/settings/PaymentSettingsForm'
+import { taxSettingsSchema } from '@/components/settings/TaxSettingsForm'
+
+type SettingsFormValues =
+    z.infer<typeof storeConfigSchema> |
+    z.infer<typeof paymentSettingsSchema> |
+    z.infer<typeof taxSettingsSchema>
 
 export default function AdminSettingsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    async function onSubmit(values: any) {
+
+
+
+    async function onSubmit(values: SettingsFormValues) {
         setIsSubmitting(true)
         try {
             await new Promise((resolve) => setTimeout(resolve, 2000))
