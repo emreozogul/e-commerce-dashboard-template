@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 type TaxSettingsFormProps = {
-    onSubmit: (data: any) => void
+    onSubmit: (data: Record<string, string | number>) => void
     isSubmitting: boolean
 }
 
@@ -26,7 +26,10 @@ export function TaxSettingsForm({ onSubmit, isSubmitting }: TaxSettingsFormProps
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        onSubmit(formData)
+        onSubmit({
+            enableTax: formData.enableTax ? '1' : '0',
+            taxRate: formData.taxRate.toString()
+        })
     }
 
     return (
@@ -42,7 +45,7 @@ export function TaxSettingsForm({ onSubmit, isSubmitting }: TaxSettingsFormProps
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                             <label htmlFor="enableTax">Enable Tax Calculation</label>
-                            <p>Turn on to apply tax to orders.</p>
+                            <p className="text-sm text-gray-500">Turn on to apply tax to orders.</p>
                         </div>
                         <Switch
                             id="enableTax"

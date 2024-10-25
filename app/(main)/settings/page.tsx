@@ -6,7 +6,7 @@ import { toast } from '@/hooks/use-toast'
 import { StoreConfigForm, PaymentSettingsForm, TaxSettingsForm } from '@/components/settings'
 
 type SettingsFormValues = {
-    [key: string]: any;
+    [key: string]: string | number | boolean;
 }
 
 export default function AdminSettingsPage() {

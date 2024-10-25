@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
-export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any, isSubmitting: boolean }) => {
+export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, string | boolean>) => void, isSubmitting: boolean }) => {
     const [formData, setFormData] = useState({
         stripeEnabled: false,
         paypalEnabled: false,
@@ -37,11 +37,11 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                             <label htmlFor="stripeEnabled">Enable Stripe</label>
-                            <p>Accept payments via Stripe.</p>
+                            <p className="text-sm text-gray-500">Accept payments via Stripe.</p>
                         </div>
                         <Switch
                             id="stripeEnabled"
@@ -76,7 +76,7 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                             <label htmlFor="paypalEnabled">Enable PayPal</label>
-                            <p>Accept payments via PayPal.</p>
+                            <p className="text-sm text-gray-500">Accept payments via PayPal.</p>
                         </div>
                         <Switch
                             id="paypalEnabled"
@@ -108,7 +108,7 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
                             </div>
                         </>
                     )}
-                    <p>Don&apos;t worry, your API keys are securely stored.</p>
+                    <p className="text-sm text-gray-500">Don&apos;t worry, your API keys are securely stored.</p>
                     <Button type="submit" disabled={isSubmitting}>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isSubmitting ? 'Saving...' : 'Save Payment Settings'}

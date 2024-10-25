@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
 
 type StoreConfigFormProps = {
-    onSubmit: (data: any) => void
+    onSubmit: (data: Record<string, string | number>) => void
     isSubmitting: boolean
 }
 
@@ -33,8 +33,8 @@ export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps
                 <CardDescription>Manage your store&apos;s basic information and settings.</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-8">
-                    <div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-0.5 flex flex-col gap-1">
                         <label htmlFor="storeName">Store Name</label>
                         <Input
                             id="storeName"
@@ -43,9 +43,8 @@ export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps
                             onChange={handleChange}
                             placeholder="My Awesome Store"
                         />
-                        <p>This is the name that will be displayed to your customers.</p>
+                        <p className="text-sm text-gray-500">This is the name that will be displayed to your customers.</p>
                     </div>
-                    {/* Add other form fields here */}
                     <Button type="submit" disabled={isSubmitting}>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isSubmitting ? 'Saving...' : 'Save Changes'}
