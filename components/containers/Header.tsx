@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Menu, Bell, LogOut } from "lucide-react"
+import { Menu, LogOut } from "lucide-react"
 import { useSidebarStore } from "@/store/siderbarStore"
 import { BreadcrumbNav } from "../Breadcrumb"
 

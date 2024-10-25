@@ -8,12 +8,17 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-const taxSettingsSchema = z.object({
+export const taxSettingsSchema = z.object({
     enableTax: z.boolean(),
     taxRate: z.number().min(0).max(100),
 })
 
-export function TaxSettingsForm({ onSubmit, isSubmitting }: { onSubmit: any, isSubmitting: boolean }) {
+type TaxSettingsFormProps = {
+    onSubmit: (data: z.infer<typeof taxSettingsSchema>) => void
+    isSubmitting: boolean
+}
+
+export function TaxSettingsForm({ onSubmit, isSubmitting }: TaxSettingsFormProps) {
     const form = useForm<z.infer<typeof taxSettingsSchema>>({
         resolver: zodResolver(taxSettingsSchema),
         defaultValues: {

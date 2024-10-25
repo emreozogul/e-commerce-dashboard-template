@@ -4,7 +4,7 @@ import * as z from 'zod'
 import { Loader2 } from 'lucide-react'
 import { Button, Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
 
-const storeConfigSchema = z.object({
+export const storeConfigSchema = z.object({
     storeName: z.string().min(2, { message: 'Store name must be at least 2 characters.' }),
     storeUrl: z.string().url({ message: 'Please enter a valid URL.' }),
     supportEmail: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -12,7 +12,12 @@ const storeConfigSchema = z.object({
     orderPrefix: z.string().min(1, { message: 'Order prefix is required.' }),
 })
 
-export const StoreConfigForm = ({ onSubmit, isSubmitting }: { onSubmit: any, isSubmitting: boolean }) => {
+type StoreConfigFormProps = {
+    onSubmit: (data: z.infer<typeof storeConfigSchema>) => void
+    isSubmitting: boolean
+}
+
+export const StoreConfigForm = ({ onSubmit, isSubmitting }: StoreConfigFormProps) => {
     const form = useForm<z.infer<typeof storeConfigSchema>>({
         resolver: zodResolver(storeConfigSchema),
         defaultValues: {

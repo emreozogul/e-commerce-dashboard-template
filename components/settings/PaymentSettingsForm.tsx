@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-const paymentSettingsSchema = z.object({
+export const paymentSettingsSchema = z.object({
     stripeEnabled: z.boolean(),
     paypalEnabled: z.boolean(),
     stripePublishableKey: z.string(),
