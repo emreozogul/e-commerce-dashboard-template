@@ -2,21 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -28,55 +16,104 @@ import {
 } from '@/components/ui/select'
 import { toast } from '@/hooks/use-toast'
 
-const formSchema = z.object({
-    name: z.string().min(2, {
-        message: 'Product name must be at least 2 characters.',
-    }),
-    description: z.string().min(10, {
-        message: 'Product description must be at least 10 characters.',
-    }),
-    price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-        message: 'Price must be a positive number.',
-    }),
-    category: z.string({
-        required_error: 'Please select a product category.',
-    }),
-    image: z
-        .instanceof(FileList)
-        .refine((files) => files.length > 0, 'Image is required.')
-        .transform((files) => files[0])
-        .refine((file) => file.size <= 5000000, `Max image size is 5MB.`)
-        .refine(
-            (file) =>
-                ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(
-                    file.type
-                ),
-            'Only .jpg, .jpeg, .png and .webp formats are supported.'
-        ),
-})
-
 export default function Page() {
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: '',
-            description: '',
-            price: '',
-            category: '',
-        },
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        price: '',
+        category: '',
+        image: null as File | null,
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSelectChange = (value: string) => {
+        setFormData(prev => ({ ...prev, category: value }))
+    }
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setFormData(prev => ({ ...prev, image: e.target.files![0] }))
+        }
+    }
+
+    const validateForm = () => {
+        if (formData.name.length < 2) {
+            toast({
+                title: 'Error',
+                description: 'Product name must be at least 2 characters.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        if (formData.description.length < 10) {
+            toast({
+                title: 'Error',
+                description: 'Product description must be at least 10 characters.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
+            toast({
+                title: 'Error',
+                description: 'Price must be a positive number.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        if (!formData.category) {
+            toast({
+                title: 'Error',
+                description: 'Please select a product category.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        if (!formData.image) {
+            toast({
+                title: 'Error',
+                description: 'Image is required.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        if (formData.image.size > 5000000) {
+            toast({
+                title: 'Error',
+                description: 'Max image size is 5MB.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(formData.image.type)) {
+            toast({
+                title: 'Error',
+                description: 'Only .jpg, .jpeg, .png and .webp formats are supported.',
+                variant: 'destructive',
+            })
+            return false
+        }
+        return true
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!validateForm()) return
+
         setIsSubmitting(true)
         try {
             // Simulate API call
             await new Promise((resolve) => setTimeout(resolve, 2000))
 
             // Log the form data (replace with actual API call in production)
-            console.log('Form data:', values)
+            console.log('Form data:', formData)
 
             toast({
                 title: 'Product added successfully!',
@@ -86,7 +123,7 @@ export default function Page() {
             // Redirect to products list page (adjust the route as needed)
             router.push('/products')
         } catch (error) {
-            console.error('Error adding product:', error);
+            console.error('Error adding product:', error)
             toast({
                 title: 'Error',
                 description: 'There was a problem adding the product. Please try again.',
@@ -98,117 +135,80 @@ export default function Page() {
     }
 
     return (
-        <div className="p-6 bg-gray-100 h-full ">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <FormField
-                        control={form.control}
+        <div className="p-6 bg-gray-100 h-full">
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Product Name</label>
+                    <Input
+                        id="name"
                         name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Product Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Enter product name" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    The name of your product as it will appear in the catalog.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Enter product name"
                     />
-                    <FormField
-                        control={form.control}
+                    <p className="mt-2 text-sm text-gray-500">The name of your product as it will appear in the catalog.</p>
+                </div>
+
+                <div>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                    <Textarea
+                        id="description"
                         name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        placeholder="Enter product description"
-                                        className="resize-none"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormDescription>
-                                    Provide a detailed description of your product.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder="Enter product description"
+                        className="resize-none"
                     />
-                    <FormField
-                        control={form.control}
+                    <p className="mt-2 text-sm text-gray-500">Provide a detailed description of your product.</p>
+                </div>
+
+                <div>
+                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+                    <Input
+                        id="price"
                         name="price"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Price</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        placeholder="Enter product price"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormDescription>Set the price for your product.</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        type="number"
+                        value={formData.price}
+                        onChange={handleInputChange}
+                        placeholder="Enter product price"
                     />
-                    <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Category</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="electronics">Electronics</SelectItem>
-                                        <SelectItem value="clothing">Clothing</SelectItem>
-                                        <SelectItem value="books">Books</SelectItem>
-                                        <SelectItem value="home">Home & Garden</SelectItem>
-                                        <SelectItem value="toys">Toys & Games</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>
-                                    Choose the category that best fits your product.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
+                    <p className="mt-2 text-sm text-gray-500">Set the price for your product.</p>
+                </div>
+
+                <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
+                    <Select onValueChange={handleSelectChange} value={formData.category}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="electronics">Electronics</SelectItem>
+                            <SelectItem value="clothing">Clothing</SelectItem>
+                            <SelectItem value="books">Books</SelectItem>
+                            <SelectItem value="home">Home & Garden</SelectItem>
+                            <SelectItem value="toys">Toys & Games</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <p className="mt-2 text-sm text-gray-500">Choose the category that best fits your product.</p>
+                </div>
+
+                <div>
+                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">Product Image</label>
+                    <Input
+                        id="image"
                         name="image"
-                        render={({ field: { onChange, value, ...rest } }) => (
-                            <FormItem>
-                                <FormLabel>Product Image</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => onChange(e.target.files)}
-                                        {...rest}
-                                    />
-                                </FormControl>
-                                <FormDescription>
-                                    Upload a main image for your product. Max size: 5MB.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
                     />
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isSubmitting ? 'Adding Product...' : 'Add Product'}
-                    </Button>
-                </form>
-            </Form>
+                    <p className="mt-2 text-sm text-gray-500">Upload a main image for your product. Max size: 5MB.</p>
+                </div>
+
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isSubmitting ? 'Adding Product...' : 'Add Product'}
+                </Button>
+            </form>
         </div>
     )
 }
