@@ -30,7 +30,6 @@ export default function AdminSettingsPage() {
 
     return (
         <div className="py-10 px-4 max-w-screen-xl mx-auto bg-gray-100 h-full">
-            <h1 className="text-3xl font-bold mb-8">Admin Settings</h1>
             <Tabs defaultValue="store" className="space-y-4 ">
                 <TabsList>
                     <TabsTrigger value="store">Store Configuration</TabsTrigger>
