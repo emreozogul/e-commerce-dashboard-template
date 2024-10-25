@@ -86,6 +86,7 @@ export default function Page() {
             // Redirect to products list page (adjust the route as needed)
             router.push('/products')
         } catch (error) {
+            console.error('Error adding product:', error);
             toast({
                 title: 'Error',
                 description: 'There was a problem adding the product. Please try again.',
