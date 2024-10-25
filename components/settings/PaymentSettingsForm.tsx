@@ -1,35 +1,32 @@
+import React, { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 
-export const paymentSettingsSchema = z.object({
-    stripeEnabled: z.boolean(),
-    paypalEnabled: z.boolean(),
-    stripePublishableKey: z.string(),
-    stripeSecretKey: z.string(),
-    paypalClientId: z.string(),
-    paypalSecret: z.string(),
-})
-
-export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any, isSubmitting: boolean }) => {
-
-    const form = useForm<z.infer<typeof paymentSettingsSchema>>({
-        resolver: zodResolver(paymentSettingsSchema),
-        defaultValues: {
-            stripeEnabled: false,
-            paypalEnabled: false,
-            stripePublishableKey: '',
-            stripeSecretKey: '',
-            paypalClientId: '',
-            paypalSecret: '',
-        },
+export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, string | boolean>) => void, isSubmitting: boolean }) => {
+    const [formData, setFormData] = useState({
+        stripeEnabled: false,
+        paypalEnabled: false,
+        stripePublishableKey: '',
+        stripeSecretKey: '',
+        paypalClientId: '',
+        paypalSecret: '',
     })
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }))
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        onSubmit(formData)
+    }
 
     return (
         <Card>
@@ -40,119 +37,83 @@ export const PaymentSettingsForm = ({ onSubmit, isSubmitting }: { onSubmit: any,
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <FormField
-                            control={form.control}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <label htmlFor="stripeEnabled">Enable Stripe</label>
+                            <p className="text-sm text-gray-500">Accept payments via Stripe.</p>
+                        </div>
+                        <Switch
+                            id="stripeEnabled"
                             name="stripeEnabled"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <FormLabel className="text-base">
-                                            Enable Stripe
-                                        </FormLabel>
-                                        <FormDescription>
-                                            Accept payments via Stripe.
-                                        </FormDescription>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
+                            checked={formData.stripeEnabled}
+                            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, stripeEnabled: checked }))}
                         />
-                        {form.watch('stripeEnabled') && (
-                            <>
-                                <FormField
-                                    control={form.control}
+                    </div>
+                    {formData.stripeEnabled && (
+                        <>
+                            <div>
+                                <label htmlFor="stripePublishableKey">Stripe Publishable Key</label>
+                                <Input
+                                    id="stripePublishableKey"
                                     name="stripePublishableKey"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Stripe Publishable Key</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    value={formData.stripePublishableKey}
+                                    onChange={handleChange}
                                 />
-                                <FormField
-                                    control={form.control}
+                            </div>
+                            <div>
+                                <label htmlFor="stripeSecretKey">Stripe Secret Key</label>
+                                <Input
+                                    id="stripeSecretKey"
                                     name="stripeSecretKey"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Stripe Secret Key</FormLabel>
-                                            <FormControl>
-                                                <Input type="password" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    type="password"
+                                    value={formData.stripeSecretKey}
+                                    onChange={handleChange}
                                 />
-                            </>
-                        )}
-                        <FormField
-                            control={form.control}
+                            </div>
+                        </>
+                    )}
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <label htmlFor="paypalEnabled">Enable PayPal</label>
+                            <p className="text-sm text-gray-500">Accept payments via PayPal.</p>
+                        </div>
+                        <Switch
+                            id="paypalEnabled"
                             name="paypalEnabled"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <FormLabel className="text-base">
-                                            Enable PayPal
-                                        </FormLabel>
-                                        <FormDescription>
-                                            Accept payments via PayPal.
-                                        </FormDescription>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
+                            checked={formData.paypalEnabled}
+                            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, paypalEnabled: checked }))}
                         />
-                        {form.watch('paypalEnabled') && (
-                            <>
-                                <FormField
-                                    control={form.control}
+                    </div>
+                    {formData.paypalEnabled && (
+                        <>
+                            <div>
+                                <label htmlFor="paypalClientId">PayPal Client ID</label>
+                                <Input
+                                    id="paypalClientId"
                                     name="paypalClientId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>PayPal Client ID</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    value={formData.paypalClientId}
+                                    onChange={handleChange}
                                 />
-                                <FormField
-                                    control={form.control}
+                            </div>
+                            <div>
+                                <label htmlFor="paypalSecret">PayPal Secret</label>
+                                <Input
+                                    id="paypalSecret"
                                     name="paypalSecret"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>PayPal Secret</FormLabel>
-                                            <FormControl>
-                                                <Input type="password" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    type="password"
+                                    value={formData.paypalSecret}
+                                    onChange={handleChange}
                                 />
-                            </>
-                        )}
-                        <FormDescription>Don&apos;t worry, your API keys are securely stored.</FormDescription>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {isSubmitting ? 'Saving...' : 'Save Payment Settings'}
-                        </Button>
-                    </form>
-                </Form>
+                            </div>
+                        </>
+                    )}
+                    <p className="text-sm text-gray-500">Don&apos;t worry, your API keys are securely stored.</p>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isSubmitting ? 'Saving...' : 'Save Payment Settings'}
+                    </Button>
+                </form>
             </CardContent>
         </Card>
     )

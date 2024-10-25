@@ -4,15 +4,10 @@ import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/hooks/use-toast'
 import { StoreConfigForm, PaymentSettingsForm, TaxSettingsForm } from '@/components/settings'
-import { z } from 'zod'
-import { storeConfigSchema } from '@/components/settings/StoreConfigForm'
-import { paymentSettingsSchema } from '@/components/settings/PaymentSettingsForm'
-import { taxSettingsSchema } from '@/components/settings/TaxSettingsForm'
 
-type SettingsFormValues =
-    z.infer<typeof storeConfigSchema> |
-    z.infer<typeof paymentSettingsSchema> |
-    z.infer<typeof taxSettingsSchema>
+type SettingsFormValues = {
+    [key: string]: string | number | boolean;
+}
 
 export default function AdminSettingsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,6 +15,7 @@ export default function AdminSettingsPage() {
     async function onSubmit(values: SettingsFormValues) {
         setIsSubmitting(true)
         try {
+            // Simulate API call
             await new Promise((resolve) => setTimeout(resolve, 2000))
             console.log('Form data:', values)
             toast({
@@ -27,7 +23,7 @@ export default function AdminSettingsPage() {
                 description: 'Your changes have been saved.',
             })
         } catch (error) {
-            console.error('Error:', error) // Use the error variable
+            console.error('Error updating settings:', error)
             toast({
                 title: 'Error',
                 description: 'There was a problem updating the settings. Please try again.',
@@ -40,7 +36,7 @@ export default function AdminSettingsPage() {
 
     return (
         <div className="py-10 px-4 max-w-screen-xl mx-auto bg-gray-100 h-full">
-            <Tabs defaultValue="store" className="space-y-4 ">
+            <Tabs defaultValue="store" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="store">Store Configuration</TabsTrigger>
                     <TabsTrigger value="payment">Payment Settings</TabsTrigger>
